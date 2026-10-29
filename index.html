@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. AI Chat</title>
+    <style>
+        body {
+            background-color: #0b0f19;
+            color: #00f3ff;
+            font-family: monospace;
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            height: 90vh;
+        }
+        h2 {
+            text-align: center;
+            color: #00f3ff;
+            text-shadow: 0 0 10px rgba(0,243,255,0.4);
+        }
+        #chat {
+            flex: 1;
+            background: #121824;
+            border: 1px solid #00f3ff;
+            border-radius: 10px;
+            padding: 10px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .msg {
+            margin: 8px 0;
+            padding: 8px;
+            border-radius: 5px;
+        }
+        .jarvis { background: #1a2332; color: #a5f3fc; }
+        .user { background: #00f3ff55; color: #fff; text-align: right; }
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+        input {
+            flex: 1;
+            background: #0b0f19;
+            border: 1px solid #00f3ff;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            outline: none;
+        }
+        button {
+            background: #00f3ff;
+            color: #0b0f19;
+            border: none;
+            padding: 10px 15px;
+            font-weight: bold;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>J.A.R.V.I.S. OS</h2>
+
+    <div id="chat">
+        <div class="msg jarvis">Sistemas en línea, Señor. Listo para operar.</div>
+    </div>
+
+    <div class="controls">
+        <button onclick="hablarVoz()">🎙️ Hablar</button>
+        <input type="text" id="textoInput" placeholder="Escribe una orden..." onkeydown="if(event.key==='Enter')enviarTexto()">
+        <button onclick="enviarTexto()">Enviar</button>
+    </div>
+
+    <script>
+        const chat = document.getElementById('chat');
+
+        function agregarMsg(remitente, texto) {
+            chat.innerHTML += `<div class="msg ${remitente}">${texto}</div>`;
+            chat.scrollTop = chat.scrollHeight;
+        }
+
+        function responderJarvis(pregunta) {
+            let respuesta = "";
+            let p = pregunta.toLowerCase();
+
+            if(p.includes("hora")) {
+                respuesta = "La hora actual es " + new Date().toLocaleTimeString() + ", Señor.";
+            } else if(p.includes("estado") || p.includes("sistema")) {
+                respuesta = "Todos los núcleos y sistemas operando al 100 por ciento.";
+            } else {
+                respuesta = "Orden procesada con éxito, Señor. Analizando datos sobre: " + pregunta;
+            }
+
+            agregarMsg("jarvis", respuesta);
+            
+            // Síntesis de voz
+            const utterance = new SpeechSynthesisUtterance(respuesta);
+            utterance.lang = 'es-ES';
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function enviarTexto() {
+            let input = document.getElementById('textoInput');
+            if(input.value.trim() === "") return;
+            let val = input.value;
+            agregarMsg("user", val);
+            input.value = "";
+            setTimeout(() => responderJarvis(val), 500);
+        }
+
+        function hablarVoz() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if(!SpeechRecognition) {
+                alert("Tu navegador no soporta voz.");
+                return;
+            }
+            const rec = new SpeechRecognition();
+            rec.lang = 'es-ES';
+            rec.onresult = function(e) {
+                let dicho = e.results[0][0].transcript;
+                agregarMsg("user", dicho);
+                responderJarvis(dicho);
+            };
+            rec.start();
+        }
+    </script>
+
+</body>
+</html>
