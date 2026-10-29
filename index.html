@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>J.A.R.V.I.S. AI Chat</title>
+    <style>
+        :root {
+            --bg-color: #131517;
+            --chat-bg: #1e2227;
+            --text-main: #e3e6ed;
+            --accent: #00f3ff;
+            --user-bubble: #2b323b;
+            --jarvis-bubble: #181c22;
+        }
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            overflow: hidden;
+        }
+        header {
+            background-color: var(--chat-bg);
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            border-bottom: 1px solid #2d333b;
+            color: var(--accent);
+            letter-spacing: 1px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+        .chat-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 14px;
+            font-size: 15px;
+            line-height: 1.4;
+            word-wrap: break-word;
+        }
+        .user-message {
+            background-color: var(--user-bubble);
+            color: #ffffff;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        .jarvis-message {
+            background-color: var(--jarvis-bubble);
+            color: var(--text-main);
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #2b323b;
+        }
+        .status-bar {
+            font-size: 12px;
+            text-align: center;
+            color: #8b949e;
+            padding: 5px;
+            background: rgba(0,0,0,0.1);
+        }
+        .input-area {
+            background-color: var(--chat-bg);
+            padding: 10px 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            border-top: 1px solid #2d333b;
+        }
+        input[type="text"] {
+            flex: 1;
+            background-color: var(--bg-color);
+            border: 1px solid #30363d;
+            border-radius: 20px;
+            padding: 12px 18px;
+            color: white;
+            font-size: 15px;
+            outline: none;
+        }
+        input[type="text"]:focus {
+            border-color: var(--accent);
+        }
+        .action-btn {
+            background: var(--accent);
+            color: #0b0f19;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <header>J.A.R.V.I.S. // Sistemas Conectados</header>
+    
+    <div class="status-bar" id="statusBar">Modo de escucha pasiva activo: Di "Jarvis" para comenzar...</div>
+
+    <div class="chat-container" id="chatContainer">
+        <div class="message jarvis-message">
+            Sistemas en línea, Señor. Estoy escuchando. Diga mi nombre para interactuar o escriba su consulta.
+        </div>
+    </div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Escribe un mensaje o di 'Jarvis'..." onkeypress="handleKeyPress(event)">
+        <button class="action-btn" onclick="enviarMensajeTexto()">➤</button>
+    </div>
+
+    <script>
+        const chatContainer = document.getElementById('chatContainer');
+        const statusBar = document.getElementById('statusBar');
+        const userInput = document.getElementById('userInput');
+
+        // Sintetizador de voz (JARVIS habla)
+        function hablar(texto) {
+            const mensaje = new SpeechSynthesisUtterance(texto);
+            mensaje.lang = 'es-ES';
+            mensaje.rate = 1.0;
+            window.speechSynthesis.speak(mensaje);
+        }
+
+        function agregarMensaje(texto, remitente) {
+            const div = document.createElement('div');
+            div.classList.add('message');
+            div.classList.add(remitente === 'user' ? 'user-message' : 'jarvis-message');
+            div.textContent = texto;
+            chatContainer.appendChild(div);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Lógica de respuesta inteligente conectada a bases de conocimiento / simulación avanzada
+        async function procesarConsulta(pregunta) {
+            const preguntaLower = pregunta.toLowerCase();
+            agregarMensaje(pregunta, 'user');
+            
+            statusBar.textContent = "Procesando datos...";
+            
+            let respuesta = "";
+
+            // Consultas inteligentes básicas del sistema o respuestas generales
+            if (preguntaLower.includes("hora")) {
+                respuesta = `La hora actual del sistema es ${new Date().toLocaleTimeString()}.`;
+            } else if (preguntaLower.includes("estado") || preguntaLower.includes("sistema")) {
+                respuesta = "Todos los núcleos operando al máximo rendimiento, Señor.";
+            } else if (preguntaLower.includes("recuérdame") || preguntaLower.includes("recordatorio")) {
+                respuesta = "He registrado el parámetro en la memoria local de la aplicación, Señor.";
+            } else {
+                // Simulación de respuesta abierta con estilo de Inteligencia Artificial avanzada
+                respuesta = `Analizando su consulta sobre "${pregunta}". Basado en los registros globales y las directrices del sistema, le informo que los parámetros se mantienen estables. ¿Desea que desglose más información al respecto?`;
+            }
+
+            setTimeout(() => {
+                agregarMensaje(respuesta, 'jarvis');
+                hablar(respuesta);
+                statusBar.textContent = "Modo de escucha pasiva activo: Di 'Jarvis' para comenzar...";
+            }, 600);
+        }
+
+        function enviarMensajeTexto() {
+            const texto = userInput.value.trim();
+            if(texto === "") return;
+            userInput.value = "";
+            procesarConsulta(texto);
+        }
+
+        function handleKeyPress(e) {
+            if (e.key === 'Enter') {
+                enviarMensajeTexto();
+            }
+        }
+
+        // --- SISTEMA DE ESCUCHA POR PALABRA CLAVE ("JARVIS") ---
+        function iniciarEscuchaContinua() {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            
+            if (!SpeechRecognition) {
+                statusBar.textContent = "El navegador no soporta reconocimiento de voz continuo.";
+                return;
+            }
+
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'es-ES';
+            recognition.continuous = true;
+            recognition.interimResults = false;
+
+            recognition.onstart = function() {
+                statusBar.textContent = "🟢 Escuchando palabra clave ('Jarvis')...";
+            };
+
+            recognition.onresult = function(event) {
+                const ultimoIndex = event.results.length - 1;
+                const textoEscuchado = event.results[ultimoIndex][0].transcript.toLowerCase();
+                
+                // Si pronuncias la palabra clave "jarvis"
+                if (textoEscuchado.includes("jarvis")) {
+                    statusBar.textContent = "⚠️ ¡JARVIS activado! Hable ahora...";
+                    hablar("Sí, Señor. Lo escucho.");
+                    
+                    // Extraer lo que dijiste después de la palabra Jarvis si lo deseas
+                    let consultaReal = textoEscuchado.replace("jarvis", "").trim();
+                    if(consultaReal.length > 2) {
+                        procesarConsulta(consultaReal);
+                    }
+                }
+            };
+
+            recognition.onerror = function(event) {
+                // Reiniciar automáticamente si hay corte de audio para mantenerlo activo
+                try { recognition.start(); } catch(e) {}
+            };
+
+            recognition.onend = function() {
+                // Mantener el ciclo de escucha activo de forma continua
+                try { recognition.start(); } catch(e) {}
+            };
+
+            try {
+                recognition.start();
+            } catch(e) {
+                console.log("Iniciación manual requerida por políticas del navegador.");
+            }
+        }
+
+        // Iniciar motor de escucha al tocar la pantalla por primera vez (requisito de seguridad de Android)
+        window.addEventListener('click', () => {
+            iniciarEscuchaContinua();
+        }, { once: true });
+    </script>
+
+</body>
+</html>
